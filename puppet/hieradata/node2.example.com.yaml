@@ -1,0 +1,12 @@
+---
+messageEnv: 'node2'
+
+domain_name:                "Wls1212"
+
+domain_node_address:        "10.10.10.200"
+domain_nodemanager_port:    5556
+
+domain_adminserver_address: "10.10.10.10"
+domain_adminserver_port:    7001
+
+domain_wls_password:        "weblogic1"
