@@ -60,49 +60,49 @@ define wls::copydomain ($version         = '1111',
 
    if ( $continue ) {
 
-	   case $operatingsystem {
-	     CentOS, RedHat, OracleLinux, Ubuntu, Debian, SLES: {
+     case $operatingsystem {
+       CentOS, RedHat, OracleLinux, Ubuntu, Debian, SLES: {
 
-	        $execPath         = "/usr/java/${fullJDKName}/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin"
-	        $path             = $downloadDir
-	        $JAVA_HOME        = "/usr/java/${fullJDKName}"
+          $execPath         = "/usr/java/${fullJDKName}/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin"
+          $path             = $downloadDir
+          $JAVA_HOME        = "/usr/java/${fullJDKName}"
 
-	        Exec { path      => $execPath,
-	               user      => $user,
-	               group     => $group,
-	               logoutput => true,
-	             }
-	        File {
-	               ensure  => present,
-	               replace => true,
-	               mode    => 0775,
-	               owner   => $user,
-	               group   => $group,
+          Exec { path      => $execPath,
+                 user      => $user,
+                 group     => $group,
+                 logoutput => true,
+               }
+          File {
+                 ensure  => present,
+                 replace => true,
+                 mode    => 0775,
+                 owner   => $user,
+                 group   => $group,
                  backup  => false,
-	             }
-	     }
-	     Solaris: {
+               }
+       }
+       Solaris: {
 
-	        $execPath         = "/usr/jdk/${fullJDKName}/bin/amd64:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin"
-	        $path             = $downloadDir
-	        $JAVA_HOME        = "/usr/jdk/${fullJDKName}"
+          $execPath         = "/usr/jdk/${fullJDKName}/bin/amd64:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin"
+          $path             = $downloadDir
+          $JAVA_HOME        = "/usr/jdk/${fullJDKName}"
 
-	        Exec { path      => $execPath,
-	               user      => $user,
-	               group     => $group,
-	               logoutput => true,
-	             }
-	        File {
-	               ensure  => present,
-	               replace => true,
-	               mode    => 0775,
-	               owner   => $user,
-	               group   => $group,
+          Exec { path      => $execPath,
+                 user      => $user,
+                 group     => $group,
+                 logoutput => true,
+               }
+          File {
+                 ensure  => present,
+                 replace => true,
+                 mode    => 0775,
+                 owner   => $user,
+                 group   => $group,
                  backup  => false,
-	             }
+               }
 
-	     }
-	   }
+       }
+     }
 
     if $logDir != undef {
 
@@ -200,26 +200,26 @@ define wls::copydomain ($version         = '1111',
        content => template("wls/wlst/enrollDomain.py.erb"),
      }
 
-	   case $operatingsystem {
-	       CentOS, RedHat, OracleLinux, Ubuntu, Debian, SLES, Solaris: {
+     case $operatingsystem {
+         CentOS, RedHat, OracleLinux, Ubuntu, Debian, SLES, Solaris: {
 
-	        exec { "execwlst ${domain} ${title}":
-	          command     => "${wlHome}/common/bin/wlst.sh ${path}/enroll_domain_${domain}.py",
-	          environment => ["JAVA_HOME=${JAVA_HOME}"],
-	          require     => [File["${path}/enroll_domain_${domain}.py"],
-	                          Exec["unpack ${domain}"]],
-	        }
+          exec { "execwlst ${domain} ${title}":
+            command     => "${wlHome}/common/bin/wlst.sh ${path}/enroll_domain_${domain}.py",
+            environment => ["JAVA_HOME=${JAVA_HOME}"],
+            require     => [File["${path}/enroll_domain_${domain}.py"],
+                            Exec["unpack ${domain}"]],
+          }
 
-	        case $operatingsystem {
-	           CentOS, RedHat, OracleLinux, Ubuntu, Debian, SLES, Solaris: {
-	              exec { "domain.py ${domain} ${title}":
-	                command     => "rm ${path}/enroll_domain_${domain}.py",
-	                require     => Exec["execwlst ${domain} ${title}"],
-	              }
-	           }
-	        }
-	     }
-	   }
+          case $operatingsystem {
+             CentOS, RedHat, OracleLinux, Ubuntu, Debian, SLES, Solaris: {
+                exec { "domain.py ${domain} ${title}":
+                  command     => "rm ${path}/enroll_domain_${domain}.py",
+                  require     => Exec["execwlst ${domain} ${title}"],
+                }
+             }
+          }
+       }
+     }
 
    }
 }
