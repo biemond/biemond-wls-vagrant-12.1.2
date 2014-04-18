@@ -30,15 +30,16 @@
 #
 #
 
-define wls::installwls( $version     = undef,
-                        $fullJDKName = undef,
-                        $oracleHome  = undef,
-                        $mdwHome     = undef,
-                        $createUser  = true,
-                        $user        = 'oracle',
-                        $group       = 'dba',
-                        $downloadDir = '/install',
-                        $remoteFile  = true,
+define wls::installwls( $version                 = undef,
+                        $fullJDKName             = undef,
+                        $oracleHome              = undef,
+                        $mdwHome                 = undef,
+                        $createUser              = true,
+                        $user                    = 'oracle',
+                        $group                   = 'dba',
+                        $downloadDir             = '/install',
+                        $remoteFile              = true,
+                        $javaParameters          = '', # '-Dspace.detection=false'
                         $puppetDownloadMntPoint  = undef,
                       ) {
 
@@ -62,7 +63,7 @@ define wls::installwls( $version     = undef,
 
         $oraInventory    = "${oracleHome}/oraInventory"
         $oraInstPath     = "/etc"
-        $java_statement  = "java"
+        $java_statement  = "java ${javaParameters}"
 
         Exec { path      => $execPath,
                user      => $user,
@@ -85,7 +86,7 @@ define wls::installwls( $version     = undef,
 
         $oraInventory    = "${oracleHome}/oraInventory"
         $oraInstPath     = "/var/opt"
-        $java_statement  = "java -d64"
+        $java_statement  = "java -d64 ${javaParameters}"
 
         Exec { path      => $execPath,
                user      => $user,

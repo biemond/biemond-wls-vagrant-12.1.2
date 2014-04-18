@@ -14,10 +14,31 @@ ADMIN_PASSWORD='<%= @password %>'
 
 JAVA_HOME='<%= @JAVA_HOME %>'
 
+
+<% if @java_arguments["ADM"] %>
+ADM_JAVA_ARGUMENTS='<%= @java_arguments["ADM"] %>'
+<% else %>
 ADM_JAVA_ARGUMENTS='-XX:PermSize=256m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @adminNodeMgrLogDir %>/<%= @adminServerName %>.out -Dweblogic.Stderr=<%= @adminNodeMgrLogDir %>/<%= @adminServerName %>_err.out'
-OAM_JAVA_ARGUMENTS='-XX:PermSize=512m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @oamNodeMgrLogDir %>/oam_server1.out -Dweblogic.Stderr=<%= @oamNodeMgrLogDir %>/oam_server1_err.out'
+<% end %>
+
+<% if @java_arguments["SOA"] %>
+SOA_JAVA_ARGUMENTS='<%= @java_arguments["SOA"] %>'
+<% else %>
 SOA_JAVA_ARGUMENTS='-XX:PermSize=512m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @soaNodeMgrLogDir %>/soa_server1.out -Dweblogic.Stderr=<%= @soaNodeMgrLogDir %>/soa_server1_err.out'
+<% end %>
+
+<% if @java_arguments["OAM"] %>
+OAM_JAVA_ARGUMENTS='<%= @java_arguments["OAM"] %>'
+<% else %>
+OAM_JAVA_ARGUMENTS='-XX:PermSize=512m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @oamNodeMgrLogDir %>/oam_server1.out -Dweblogic.Stderr=<%= @oamNodeMgrLogDir %>/oam_server1_err.out'
+<% end %>
+
+<% if @java_arguments["OIM"] %>
+OIM_JAVA_ARGUMENTS='<%= @java_arguments["OIM"] %>'
+<% else %>
 OIM_JAVA_ARGUMENTS='-XX:PermSize=512m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @oimNodeMgrLogDir %>/oim_server1.out -Dweblogic.Stderr=<%= @oimNodeMgrLogDir %>/oim_server1_err.out'
+<% end %>
+
 
 
 OIM_REPOS_DBURL='<%= @reposDbUrl %>'
@@ -43,9 +64,6 @@ def createAdminStartupPropertiesFile(directoryPath, args):
   fileNew.flush()
   fileNew.close()
 
-
-
-
 print('Start...wls domain with template <%= @template %>')
 readTemplate('<%= @template %>')
 
@@ -53,7 +71,6 @@ print('Set crossdomain')
 create('base_domain','SecurityConfiguration')
 cd('/SecurityConfiguration/base_domain')
 set('CrossDomainSecurityEnabled',true)
-
 
 cd('/')
 print('Set domain log')
@@ -65,7 +82,7 @@ set('FileMinSize',5000)
 set('RotationType','byTime')
 set('FileTimeSpan',24)
 
-
+print('Change domain log')
 cd('/Servers/AdminServer')
 # name of adminserver
 set('Name',ADMIN_SERVER )
@@ -154,14 +171,11 @@ addTemplate('<%= @templateSOA %>')
 print 'Adding EM Template'
 addTemplate('<%= @templateEM %>')
 
-
 print 'Adding OIM Template'
 addTemplate('<%= @templateOIM %>')
 
 print 'Adding OAM Template'
 addTemplate('<%= @templateOAM %>')
-
-
 
 dumpStack();
 
@@ -264,10 +278,24 @@ closeDomain();
 
 readDomain(DOMAIN_PATH)
 
-print 'Change soa_server1'
 setOption( "AppDir", APP_PATH )
+
+print('change the default machine LocalMachine with type Machine')
+cd('/')
+cd('Machine/LocalMachine')
+create('LocalMachine','NodeManager')
+cd('NodeManager/LocalMachine')
+set('ListenAddress','<%= @adminListenAdr %>')
+
+print 'Change AdminServer'
+cd('/Servers/'+ADMIN_SERVER)
+set('Machine','LocalMachine')
+
+print 'Change soa_server1'
 cd('/Servers/soa_server1')
 set('Machine','LocalMachine')
+# set listen adress on server
+set('ListenAddress','<%= @adminListenAdr %>')
 
 create('soa_server1','ServerStart')
 cd('ServerStart/soa_server1')
@@ -295,6 +323,9 @@ set('FileTimeSpan',24)
 print 'Change oam_server1'
 cd('/Servers/oam_server1')
 set('Machine','LocalMachine')
+# set listen adress on server
+set('ListenAddress','<%= @adminListenAdr %>')
+
 
 create('oam_server1','ServerStart')
 cd('ServerStart/oam_server1')
@@ -322,6 +353,8 @@ set('FileTimeSpan',24)
 print 'Change oim_server1'
 cd('/Servers/oim_server1')
 set('Machine','LocalMachine')
+# set listen adress on server
+set('ListenAddress','<%= @adminListenAdr %>')
 
 create('oim_server1','ServerStart')
 cd('ServerStart/oim_server1')
@@ -345,9 +378,6 @@ set('FileMinSize',5000)
 set('RotationType','byTime')
 set('FileTimeSpan',24)
 
-
-
-
 dumpStack();
 updateDomain()
 closeDomain()
@@ -356,29 +386,6 @@ closeDomain()
 createBootPropertiesFile(DOMAIN_PATH+'/servers/soa_server1/security','boot.properties',ADMIN_USER,ADMIN_PASSWORD)
 createBootPropertiesFile(DOMAIN_PATH+'/servers/oim_server1/security','boot.properties',ADMIN_USER,ADMIN_PASSWORD)
 createBootPropertiesFile(DOMAIN_PATH+'/servers/oam_server1/security','boot.properties',ADMIN_USER,ADMIN_PASSWORD)
-
-
-readDomain(DOMAIN_PATH)
-
-
-setOption( "AppDir", APP_PATH )
-
-cd('/Servers/AdminServer')
-set('Machine','LocalMachine')
-
-cd('/Servers/oam_server1')
-set('Machine','LocalMachine')
-
-cd('/Servers/oim_server1')
-set('Machine','LocalMachine')
-
-cd('/Servers/soa_server1')
-set('Machine','LocalMachine')
-
-
-dumpStack();
-updateDomain()
-closeDomain()
 
 print('Exiting...')
 exit()

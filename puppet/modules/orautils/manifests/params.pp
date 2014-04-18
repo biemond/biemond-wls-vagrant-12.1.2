@@ -1,4 +1,7 @@
-class orautils::params {
+#
+#
+class orautils::params
+{
 
   $osOracleHome = $::hostname ? {
                                     wls12           => "/oracle/product",
@@ -26,9 +29,9 @@ class orautils::params {
 
   $osDownloadFolder = $::hostname ? { default    => "/data/install",}
 
-	$shell        = $::operatingsystem ? { Solaris => "!/usr/bin/ksh",
-  															         default => "!/bin/sh",
-  															       }
+  $shell        = $::operatingsystem ? { 'Solaris' => "!/usr/bin/ksh",
+                                         default => "!/bin/sh",
+                                       }
 
   $osMdwHome     = $::hostname ?  { wls12           => "${osOracleHome}/Middleware12c",
                                     default         => "${osOracleHome}/Middleware11gR1",
@@ -40,13 +43,13 @@ class orautils::params {
 
   $oraUser      = $::hostname ? { default => "oracle", }
 
-  $userHome     = $::operatingsystem ? { Solaris => "/export/home",
-  															         default => "/home",
-  															       }
+  $userHome     = $::operatingsystem ? { 'Solaris' => "/export/home",
+                                         default => "/home",
+                                       }
 
-  $oraInstHome  = $::operatingsystem ? { Solaris => "/var/opt",
-  															         default => "/etc",
-  															       }
+  $oraInstHome  = $::operatingsystem ? { 'Solaris' => "/var/opt",
+                                         default => "/etc",
+                                       }
 
   $osDomain     = $::hostname ? {   wls12           => "Wls12c",
                                     oimapp          => "oimDomain",
@@ -65,6 +68,9 @@ class orautils::params {
   $nodeMgrPort = $::hostname ?  {
                                     default    => "5556",
                                 }
+  $nodeMgrAddress = $::hostname ?  {
+                                    default    => "localhost",
+                                   }
 
   $wlsUser     = $::hostname ?  {
                                     default    => "weblogic",
@@ -77,5 +83,9 @@ class orautils::params {
   $wlsAdminServer = $::hostname ?  {
                                     default    => "AdminServer",
                                 }
+  $jsseEnabled = $::hostname ?  {
+                                    default    => false,
+                                }
+
 
 }

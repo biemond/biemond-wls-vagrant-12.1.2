@@ -1,3 +1,6 @@
+#
+#
+#
 class orautils(
   $osOracleHomeParam      = undef,
   $oraInventoryParam      = undef,
@@ -11,15 +14,17 @@ class orautils(
   $osDomainPathParam      = undef,
   $nodeMgrPathParam       = undef,
   $nodeMgrPortParam       = undef,
+  $nodeMgrAddressParam    = undef,
   $wlsUserParam           = undef,
   $wlsPasswordParam       = undef,
   $wlsAdminServerParam    = undef,
+  $jsseEnabledParam       = undef,
 ) {
 
   include orautils::params
 
   case $operatingsystem {
-    CentOS, RedHat, OracleLinux, Ubuntu, Debian, SLES, Solaris: {
+    'CentOS', 'RedHat', 'OracleLinux', 'Ubuntu', 'Debian', 'SLES', 'Solaris': {
 
     # fixed
 
@@ -104,7 +109,7 @@ class orautils(
     }
 
     if ( $nodeMgrPathParam == undef ) {
-      $nodeMgrPat  = $orautils::params::nodeMgrPath
+      $nodeMgrPath  = $orautils::params::nodeMgrPath
     } else {
       $nodeMgrPath = $nodeMgrPathParam
     }
@@ -127,9 +132,18 @@ class orautils(
       $wlsAdminServer = $wlsAdminServerParam
     }
 
+    if ( $nodeMgrAddressParam == undef ) {
+      $nodeMgrAddress = $orautils::params::nodeMgrAddress
+    } else {
+      $nodeMgrAddress = $nodeMgrAddressParam
+    }
 
-
-
+    if ( $jsseEnabledParam == undef ) {
+      $jsseEnabled = $orautils::params::jsseEnabled
+    } else {
+      $jsseEnabled = $jsseEnabledParam
+    }
+    
     if ! defined(File['/opt/scripts']) {
      file { '/opt/scripts':
        ensure  => directory,
@@ -155,8 +169,8 @@ class orautils(
 
 
     file { "showStatus.sh":
-      path    => "/opt/scripts/wls/showStatus.sh",
       ensure  => present,
+      path    => "/opt/scripts/wls/showStatus.sh",
       content => template("orautils/wls/showStatus.sh.erb"),
       owner   => $user,
       group   => $group,
@@ -165,8 +179,8 @@ class orautils(
     }
 
     file { "stopNodeManager.sh":
-      path    => "/opt/scripts/wls/stopNodeManager.sh",
       ensure  => present,
+      path    => "/opt/scripts/wls/stopNodeManager.sh",
       content => template("orautils/wls/stopNodeManager.sh.erb"),
       owner   => $user,
       group   => $group,
@@ -175,8 +189,8 @@ class orautils(
     }
 
     file { "cleanOracleEnvironment.sh":
-      path    => "/opt/scripts/wls/cleanOracleEnvironment.sh",
       ensure  => present,
+      path    => "/opt/scripts/wls/cleanOracleEnvironment.sh",
       content => template("orautils/cleanOracleEnvironment.sh.erb"),
       owner   => 'root',
       group   => 'root',
@@ -186,8 +200,8 @@ class orautils(
 
 
     file { "startNodeManager.sh":
-      path    => "/opt/scripts/wls/startNodeManager.sh",
       ensure  => present,
+      path    => "/opt/scripts/wls/startNodeManager.sh",
       content => template("orautils/startNodeManager.sh.erb"),
       owner   => $user,
       group   => $group,
@@ -197,8 +211,8 @@ class orautils(
 
 
     file { "startWeblogicAdmin.sh":
-      path    => "/opt/scripts/wls/startWeblogicAdmin.sh",
       ensure  => present,
+      path    => "/opt/scripts/wls/startWeblogicAdmin.sh",
       content => template("orautils/startWeblogicAdmin.sh.erb"),
       owner   => $user,
       group   => $group,
@@ -207,8 +221,8 @@ class orautils(
     }
 
     file { "stopWeblogicAdmin.sh":
-      path    => "/opt/scripts/wls/stopWeblogicAdmin.sh",
       ensure  => present,
+      path    => "/opt/scripts/wls/stopWeblogicAdmin.sh",
       content => template("orautils/stopWeblogicAdmin.sh.erb"),
       owner   => $user,
       group   => $group,

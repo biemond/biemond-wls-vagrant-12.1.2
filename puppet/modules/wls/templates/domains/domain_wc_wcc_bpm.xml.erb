@@ -14,11 +14,35 @@ ADMIN_PASSWORD='<%= @password %>'
 
 JAVA_HOME='<%= @JAVA_HOME %>'
 
+<% if @java_arguments["ADM"] %>
+ADM_JAVA_ARGUMENTS='<%= @java_arguments["ADM"] %>'
+<% else %>
 ADM_JAVA_ARGUMENTS='-XX:PermSize=256m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @adminNodeMgrLogDir %>/<%= @adminServerName %>.out -Dweblogic.Stderr=<%= @adminNodeMgrLogDir %>/<%= @adminServerName %>_err.out'
+<% end %>
+
+<% if @java_arguments["WC_COL"] %>
+WC_COLLABORATION_JAVA_ARGUMENTS='<%= @java_arguments["WC_COL"] %>'
+<% else %>
 WC_COLLABORATION_JAVA_ARGUMENTS='-XX:PermSize=512m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @wcCollaborationNodeMgrLogDir %>/wc_collaboration.out -Dweblogic.Stderr=<%= @wcCollaborationNodeMgrLogDir %>/wc_collaboration_err.out'
+<% end %>
+
+<% if @java_arguments["WC_POR"] %>
+WC_PORTLET_JAVA_ARGUMENTS='<%= @java_arguments["WC_POR"] %>'
+<% else %>
 WC_PORTLET_JAVA_ARGUMENTS='-XX:PermSize=512m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @wcPortletNodeMgrLogDir %>/wc_portlet.out -Dweblogic.Stderr=<%= @wcPortletNodeMgrLogDir %>/wc_portlet_err.out'
+<% end %>
+
+<% if @java_arguments["WC_SPC"] %>
+WC_SPACES_JAVA_ARGUMENTS='<%= @java_arguments["WC_SPC"] %>'
+<% else %>
 WC_SPACES_JAVA_ARGUMENTS='-XX:PermSize=512m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @wcSpacesNodeMgrLogDir %>/wc_spaces.out -Dweblogic.Stderr=<%= @wcSpacesNodeMgrLogDir %>/wc_spaces_err.out'
+<% end %>
+
+<% if @java_arguments["UCM"] %>
+UMC_JAVA_ARGUMENTS='<%= @java_arguments["UCM"] %>'
+<% else %>
 UMC_JAVA_ARGUMENTS='-XX:PermSize=512m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @umcNodeMgrLogDir %>/ucm_server1.out -Dweblogic.Stderr=<%= @umcNodeMgrLogDir %>/ucm_server1_err.out'
+<% end %>
 
 
 WC_REPOS_DBURL='<%= @reposDbUrl %>'
@@ -231,20 +255,28 @@ closeDomain();
 
 readDomain(DOMAIN_PATH)
 
-print 'Adding BPM Space Template'
-addTemplate('<%= @templateBPMSpaces %>')
-
-setOption( "AppDir", APP_PATH )
-
-cd('/Servers/AdminServer')
-set('Machine','LocalMachine')
-
-
 print 'Change wc_collaboration'
 setOption( "AppDir", APP_PATH )
 
+print 'Adding BPM Space Template'
+addTemplate('<%= @templateBPMSpaces %>')
+
+print('change the default machine LocalMachine with type Machine')
+cd('/')
+cd('Machine/LocalMachine')
+create('LocalMachine','NodeManager')
+cd('NodeManager/LocalMachine')
+set('ListenAddress','<%= @adminListenAdr %>')
+
+print 'Change AdminServer'
+cd('/Servers/'+ADMIN_SERVER)
+set('Machine','LocalMachine')
+
+
 cd('/Servers/WC_Collaboration')
 set('Machine','LocalMachine')
+# set listen adress on server
+set('ListenAddress','<%= @adminListenAdr %>')
 
 create('WC_Collaboration','ServerStart')
 cd('ServerStart/WC_Collaboration')
@@ -273,6 +305,8 @@ setOption( "AppDir", APP_PATH )
 
 cd('/Servers/WC_Portlet')
 set('Machine','LocalMachine')
+# set listen adress on server
+set('ListenAddress','<%= @adminListenAdr %>')
 
 create('WC_Portlet','ServerStart')
 cd('ServerStart/WC_Portlet')
@@ -302,6 +336,8 @@ setOption( "AppDir", APP_PATH )
 
 cd('/Servers/WC_Spaces')
 set('Machine','LocalMachine')
+# set listen adress on server
+set('ListenAddress','<%= @adminListenAdr %>')
 
 create('WC_Spaces','ServerStart')
 cd('ServerStart/WC_Spaces')
@@ -330,6 +366,8 @@ setOption( "AppDir", APP_PATH )
 
 cd('/Servers/UCM_server1')
 set('Machine','LocalMachine')
+# set listen adress on server
+set('ListenAddress','<%= @adminListenAdr %>')
 
 create('UCM_server1','ServerStart')
 cd('ServerStart/UCM_server1')

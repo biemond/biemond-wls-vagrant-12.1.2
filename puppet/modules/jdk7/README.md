@@ -1,13 +1,17 @@
-jdk7 JAVA SE 7 puppet module
+JDK JAVA SE 7, 8 puppet module
 ============================== 
+[![Build Status](https://travis-ci.org/biemond/biemond-jdk7.png)](https://travis-ci.org/biemond/biemond-jdk7)
 
-Works with Puppet 2.7 & 3.0 
+
+Works with Puppet 2.7 or higher
 
 Should work for RedHat, CentOS, Ubuntu, Debian, Suse SLES or OracleLinux 
 
 Version updates
 ---------------
-
+- 0.4.0 cryptography Extension (US export policy)
+- 0.3.9 JDK8 support and option to change the default java homes folder ( default = /usr/java ) 
+- 0.3.8 rsakeySizeFix parameter set true for weblogic 12.1.1 and jdk 1.7 >= version 40
 - 0.3.6 performance fix
 - 0.3.5 ruby escaped char warnings resolved
 - 0.3.4 bugfix on install folder, conflicts with others modules
@@ -41,12 +45,42 @@ example usage
 	  jdk7::install7{ 'jdk1.7.0_40':
 	    version              => "7u40" , 
 	    fullVersion          => "jdk1.7.0_40",
+	    javaHomes            => '/usr/java/',
 	    alternativesPriority => 18000, 
 	    x64                  => true,
 	    downloadDir          => "/install",
 	    urandomJavaFix       => false,
 	    sourcePath           => "puppet:///modules/jdk7/"
 	  }
+
+or Java 8 and with rsa keySize Fix
+
+      jdk7::install7{ 'jdk1.8.0':
+        version              => "8" , 
+        fullVersion          => "jdk1.8.0",
+        alternativesPriority => 19000, 
+        x64                  => true,
+        downloadDir          => "/data/install",
+        urandomJavaFix       => true,
+        rsakeySizeFix        => false,
+        sourcePath           => "/software",
+      }
+
+or with cryptography Extension File US export
+
+	  jdk7::install7{ 'jdk1.7.0_51':
+	      version                   => "7u51" , 
+	      fullVersion               => "jdk1.7.0_51",
+	      alternativesPriority      => 18000, 
+	      x64                       => true,
+	      downloadDir               => "/data/install",
+	      urandomJavaFix            => true,
+	      rsakeySizeFix             => true,
+	      cryptographyExtensionFile => "UnlimitedJCEPolicyJDK7.zip",
+	      sourcePath                => "/software",
+	  }
+
+
 	  
 	  class { 'jdk7::urandomfix' :}
   

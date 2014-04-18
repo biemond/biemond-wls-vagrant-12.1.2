@@ -14,7 +14,11 @@ ADMIN_PASSWORD='<%= @password %>'
 
 JAVA_HOME='<%= @JAVA_HOME %>'
 
+<% if @java_arguments["ADM"] %>
+ADM_JAVA_ARGUMENTS='<%= @java_arguments["ADM"] %>'
+<% else %>
 ADM_JAVA_ARGUMENTS='-XX:PermSize=256m -XX:MaxPermSize=512m -Xms1024m -Xmx1024m -Dweblogic.Stdout=<%= @adminNodeMgrLogDir %>/<%= @adminServerName %>.out -Dweblogic.Stderr=<%= @adminNodeMgrLogDir %>/<%= @adminServerName %>_err.out'
+<% end %>
 
 def createBootPropertiesFile(directoryPath,fileName, username, password):
   adminserverDir = File(directoryPath)
@@ -55,9 +59,13 @@ set('FileMinSize',5000)
 set('RotationType','byTime')
 set('FileTimeSpan',24)
 
+print('Create machine LocalMachine with type <%= @nodeMgrMachine %>')
 cd('/')
-create('LocalMachine', '<%= @nodeMgrMachine %>')
-
+create('LocalMachine','<%= @nodeMgrMachine %>')
+cd('<%= @nodeMgrMachine %>/LocalMachine')
+create('LocalMachine','NodeManager')
+cd('NodeManager/LocalMachine')
+set('ListenAddress','<%= @adminListenAdr %>')
 
 cd('/Servers/AdminServer')
 # name of adminserver
