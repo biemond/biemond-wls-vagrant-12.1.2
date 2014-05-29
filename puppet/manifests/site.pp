@@ -185,20 +185,20 @@ class java {
 
 class wls1212{
 
-   class { 'wls::urandomfix' :}
+  class { 'wls::urandomfix' :}
 
-   $jdkWls12gJDK  = hiera('wls_jdk_version')
-   $wls12gVersion = hiera('wls_version')
-                       
-   $puppetDownloadMntPoint = hiera('wls_source')                       
- 
-   $osOracleHome = hiera('wls_oracle_base_home_dir')
-   $osMdwHome    = hiera('wls_middleware_home_dir')
-   $osWlHome     = hiera('wls_weblogic_home_dir')
-   $user         = hiera('wls_os_user')
-   $group        = hiera('wls_os_group')
-   $downloadDir  = hiera('wls_download_dir')
-   $logDir       = hiera('wls_log_dir')     
+  $jdkWls12gJDK  = hiera('wls_jdk_version')
+  $wls12gVersion = hiera('wls_version')
+                     
+  $puppetDownloadMntPoint = hiera('wls_source')                       
+
+  $osOracleHome = hiera('wls_oracle_base_home_dir')
+  $osMdwHome    = hiera('wls_middleware_home_dir')
+  $osWlHome     = hiera('wls_weblogic_home_dir')
+  $user         = hiera('wls_os_user')
+  $group        = hiera('wls_os_group')
+  $downloadDir  = hiera('wls_download_dir')
+  $logDir       = hiera('wls_log_dir')     
 
   # set the defaults
   Wls::Installwls {
@@ -219,6 +219,7 @@ class wls1212{
   }
 
   wls::opatch{'16175470_wls_patch':
+    ensure                 => 'present',
     oracleProductHome      => $osMdwHome,
     fullJDKName            => $jdkWls12gJDK,
     patchId                => '16175470',

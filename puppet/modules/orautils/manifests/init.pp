@@ -2,23 +2,26 @@
 #
 #
 class orautils(
-  $osOracleHomeParam      = undef,
-  $oraInventoryParam      = undef,
-  $osDomainTypeParam      = undef,
-  $osLogFolderParam       = undef,
-  $osDownloadFolderParam  = undef,
-  $osMdwHomeParam         = undef,
-  $osWlHomeParam          = undef,
-  $oraUserParam           = undef,
-  $osDomainParam          = undef,
-  $osDomainPathParam      = undef,
-  $nodeMgrPathParam       = undef,
-  $nodeMgrPortParam       = undef,
-  $nodeMgrAddressParam    = undef,
-  $wlsUserParam           = undef,
-  $wlsPasswordParam       = undef,
-  $wlsAdminServerParam    = undef,
-  $jsseEnabledParam       = undef,
+  $osOracleHomeParam       = undef,
+  $oraInventoryParam       = undef,
+  $osDomainTypeParam       = undef,
+  $osLogFolderParam        = undef,
+  $osDownloadFolderParam   = undef,
+  $osMdwHomeParam          = undef,
+  $osWlHomeParam           = undef,
+  $oraUserParam            = undef,
+  $osDomainParam           = undef,
+  $osDomainPathParam       = undef,
+  $nodeMgrPathParam        = undef,
+  $nodeMgrPortParam        = undef,
+  $nodeMgrAddressParam     = undef,
+  $wlsUserParam            = undef,
+  $wlsPasswordParam        = undef,
+  $wlsAdminServerParam     = undef,
+  $jsseEnabledParam        = undef,
+  $customTrust             = false,
+  $trustKeystoreFile       = undef,
+  $trustKeystorePassphrase = undef,
 ) {
 
   include orautils::params
@@ -143,27 +146,32 @@ class orautils(
     } else {
       $jsseEnabled = $jsseEnabledParam
     }
+    if $customTrust == true {
+      $trust_env = "-Dweblogic.security.TrustKeyStore=CustomTrust -Dweblogic.security.CustomTrustKeyStoreFileName=${trustKeystoreFile} -Dweblogic.security.CustomTrustKeystorePassPhrase=${trustKeystorePassphrase}"
+    } else {
+      $trust_env = ""
+    }
     
     if ! defined(File['/opt/scripts']) {
-     file { '/opt/scripts':
-       ensure  => directory,
-       recurse => false,
-       replace => false,
-       owner   => $user,
-       group   => $group,
-       mode    => $mode,
+      file { '/opt/scripts':
+        ensure  => directory,
+        recurse => false,
+        replace => false,
+        owner   => $user,
+        group   => $group,
+        mode    => $mode,
       }
     }
 
     if ! defined(File['/opt/scripts/wls']) {
-     file { '/opt/scripts/wls':
-       ensure  => directory,
-       recurse => false,
-       replace => false,
-       owner   => $user,
-       group   => $group,
-       mode    => $mode,
-       require => File['/opt/scripts'],
+      file { '/opt/scripts/wls':
+        ensure  => directory,
+        recurse => false,
+        replace => false,
+        owner   => $user,
+        group   => $group,
+        mode    => $mode,
+        require => File['/opt/scripts'],
       }
     }
 
